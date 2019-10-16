@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package pb;
+
+// 微信 Token 服务定义
+service WechatToken {
+    rpc GetToken(GetTokenRequest) returns (GetTokenReply) {}
+}
+
+message GetTokenRequest {
+    string appid = 1;
+    string appsecret = 2;
+}
+
+message GetTokenReply {
+    int64 code = 1;
+    string token = 2;
+    string err = 3;
+}
