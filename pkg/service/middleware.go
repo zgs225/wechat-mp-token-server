@@ -22,7 +22,7 @@ type loggingMiddleware struct {
 
 func (mw loggingMiddleware) GetToken(ctx context.Context, appid, appsecret string) (tk string, err error) {
 	defer func(b time.Time) {
-		mw.logger.Log("method", "GetToken", "appid", appid, "appsecret", appsecret, "token", tk, "error", err, "duration", time.Since(b))
+		mw.logger.Log("method", "GetToken", "appid", appid, "appsecret", appsecret, "token", tk, "error", err, "took", time.Since(b))
 	}(time.Now())
 
 	return mw.next.GetToken(ctx, appid, appsecret)
