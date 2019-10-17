@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/metrics"
 	"github.com/silenceper/wechat"
 	"github.com/silenceper/wechat/cache"
 )
@@ -12,9 +13,10 @@ type Service interface {
 	GetToken(ctx context.Context, appid, appsecret string) (string, error)
 }
 
-func New(c cache.Cache, log log.Logger) Service {
+func New(c cache.Cache, log log.Logger, counts metrics.Counter) Service {
 	s := NewBasicService(c)
 	s = LoggingMiddleware(log)(s)
+	s = InstrumentingMiddleware(counts)(s)
 	return s
 }
 

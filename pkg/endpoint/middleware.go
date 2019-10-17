@@ -9,7 +9,7 @@ import (
 	"github.com/go-kit/kit/metrics"
 )
 
-func InstrumentingMiddleware(duration metrics.Histogram) endpoint.Endpoint {
+func InstrumentingMiddleware(duration metrics.Histogram) endpoint.Middleware {
 	return func(next endpoint.Endpoint) endpoint.Endpoint {
 		return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 			defer func(b time.Time) {

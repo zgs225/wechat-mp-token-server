@@ -6,8 +6,8 @@ import (
 	"github.com/go-kit/kit/circuitbreaker"
 	"github.com/go-kit/kit/endpoint"
 	"github.com/go-kit/kit/metrics"
-	"github.com/go-kit/kit/tracing/zipkin"
-	stdzipkin "github.com/openzipkin/zipkin-go"
+	"github.com/go-kit/kit/tracing/opentracing"
+	stdopentracing "github.com/opentracing/opentracing-go"
 	"github.com/sony/gobreaker"
 	"github.com/zgs225/wechat-mp-token-server/pkg/service"
 )
@@ -16,13 +16,13 @@ type Set struct {
 	GetTokenEndpoint endpoint.Endpoint
 }
 
-func New(svc service.Service, duration metrics.Histogram, tracer *stdzipkin.Tracer) *Set {
+func New(svc service.Service, duration metrics.Histogram, tracer stdopentracing.Tracer) *Set {
 	var getTokenEndpoint endpoint.Endpoint
 	{
 		getTokenEndpoint = MakeGetTokenEndpoint(svc)
-		getTokenEndpoint = circuitbreaker.Gobreaker(gobreaker.Settings{})(getTokenEndpoint)
+		getTokenEndpoint = circuitbreaker.Gobreaker(gobreaker.NewCircuitBreaker(gobreaker.Settings{}))(getTokenEndpoint)
 		if tracer != nil {
-			getTokenEndpoint = zipkin.TraceEndpoint(tracer, "GetToken")(getTokenEndpoint)
+			getTokenEndpoint = opentracing.TraceServer(tracer, "GetToken")(getTokenEndpoint)
 		}
 		getTokenEndpoint = InstrumentingMiddleware(duration.With("method", "GetToken"))(getTokenEndpoint)
 	}
